@@ -14,7 +14,13 @@ var $cont_generico = 0;	// lleva un conteo para cada producto generico agregado
 function img_mouseenter(event){
 	console.log("event img_mouseenter")
 	$(event).mouseenter(function(e) {
-		
+		altura_img = $(this).offset().top;
+		if(altura_img > 280){
+			y_top = 120;
+		}else{
+			y_top = 10
+		}
+
 		// Calculate the position of the image tooltip
 		x = e.pageX - $(this).offset().left;
 		y = e.pageY - $(this).offset().top;
@@ -24,16 +30,21 @@ function img_mouseenter(event){
 		// Set the position and display the image tooltip
 		$(this).css('z-index','15')
 		.children("div.tooltip")
-		.css({'top': y + 10,'left': x + 20,'display':'block'});
+		.css({'top': y - y_top,'left': x + 15,'display':'block'});
 		  
 	   }).mousemove(function(e) {
-		   
+				altura_img = $(this).offset().top;
+				if(altura_img > 280){
+					y_top = 120;
+				}else{
+					y_top = 10
+				}
 		// Calculate the position of the image tooltip  
 		x = e.pageX - $(this).offset().left;
 		y = e.pageY - $(this).offset().top;
-		  
+		
 		// This line causes the tooltip will follow the mouse pointer
-		$(this).children("div.tooltip").css({'top': y + 10,'left': x + 20});
+		$(this).children("div.tooltip").css({'top': y - y_top,'left': x + 15});
 		  
 	   }).mouseleave(function() {
 		  
@@ -99,16 +110,18 @@ $(document).ready(function(e) {
     $("#txt_cj_codigo, #txt_cj_nombre").bind('keydown.F4', function (evt) {  $('#btn_generico').click(); });
 	$(document).bind('keydown.F4', function (evt) {  $('#btn_generico').click(); });
 	 
-	// Evento de flecha arriba para agregar producto y flecha abajo para quitar cantidad
+	// Evento de flecha derecha para agregar producto y flecha izquierda para quitar cantidad
 	$(document).bind('keydown',function(e){
-        key  = e.keyCode;
-        if(key == 39){
-			if($ultimo_codigo_prod)
-				add_cantidad($ultimo_codigo_prod); 
-        }else if(key == 37){
+      key  = e.keyCode;
+      if(key == 39){
+				if($ultimo_codigo_prod){
+					cantidadProd = $("#textbox_precio0_0"+$ultimo_codigo_prod).attr('prod_stock');
+					add_cantidad($ultimo_codigo_prod, cantidadProd); 
+				}
+      }else if(key == 37){
             if($ultimo_codigo_prod)
-				del_cantidad($ultimo_codigo_prod); 
-        }
+							del_cantidad($ultimo_codigo_prod); 
+    	}
     });
 	
  
@@ -703,9 +716,14 @@ function buscar_producto($codigo){
 		  $caja_precio_item   	   = '<input type="text" status="activo" ganancia="'+$ganancia_precio_venta.toFixed(2)+'" menudeo="'+$precio_item_total.toFixed(2)+'" proveedor="'+$precio_venta_proveedor+'" mayoreo="'+$precio_item_total_mayoreo.toFixed(2)+'" value="$'+$precio_item_total.toFixed(2)+'" id="textbox_precio0_0'+obj.codigo+'" codigo="'+obj.codigo+'" style="width:80px" id_tbl='+obj.id+' prod_stock='+obj.cantidad+'  class="txt_caja_precio" size="8" readonly>';		  		  
 				   //target="_blank"
 		  //$thumb = '<a href="img_productos/'+obj.imagen+'" class="popup-link" title="'+obj.nombre+'" >'+
-		  $thumb = '<div class="thumbnail-item" onclick="img_mouseenter(this)"><a href="#" >'+
+			if (obj.imagen != 'default_upfile.png')
+				$class = 'class="thumbnail-item" onclick="img_mouseenter(this)"';
+			else
+				$class = '';
+		  
+			$thumb = '<div '+$class+'><a href="#" >'+
 		  '<img height="46" height="58" src="img_productos/'+obj.imagen+'"></a>'+
-		  '<div class="tooltip"><img src="img_productos/'+obj.imagen+'" alt="" width="300" height="185" /><span class="overlay"></span></div></div>';
+		  '<div class="tooltip"><img src="img_productos/'+obj.imagen+'" alt="" width="192" height="144" /><span class="overlay"></span></div></div>';
 
  
 
@@ -720,7 +738,7 @@ function buscar_producto($codigo){
 		  // almacena la fila para el ITEM	
 
 		  $del_cantidad =  '<img src="images/cantidad_del.png" title="Disminuir" width="25" height="25" onclick="del_cantidad(\''+obj.codigo+'\')" class="hand" style="top: 5px; position: relative;">';
-		  $add_cantidad =  '<img src="images/cantidad_add.png" title="Aumentar" width="25" height="25" onclick="add_cantidad(\''+obj.codigo+'\')" class="hand" style="top: 5px; position: relative;">';
+		  $add_cantidad =  '<img src="images/cantidad_add.png" title="Aumentar" width="25" height="25" onclick="add_cantidad(\''+obj.codigo+'\', \''+obj.cantidad+'\')" class="hand" style="top: 5px; position: relative;">';
 
 		  $mayoreo =  '<img src="images/mayoreo.png" title="Precio Mayoreo" width="25" height="25" onclick="add_mayoreo(\''+$codigo+'\')" class="hand" style="top: 5px; position: relative;">';
 
@@ -842,9 +860,12 @@ function del_item(id_item){
 	calcular_totales();
 }
 
-function add_cantidad(codigo){
-	console.log(codigo);
+function add_cantidad(codigo, cantidadProd){
 	$cantidad = parseInt($("#textbox_"+codigo).val()) + 1;
+	if( $cantidad > cantidadProd ){
+		console.log('cantidad excedida');
+		return;
+	}
 	$precio_venta_proveedor = parseFloat($("#textbox_precio0_0"+codigo).attr('proveedor')); 
 
 	$precio_menudeo = parseFloat($("#textbox_precio0_0"+codigo).attr('menudeo'));  

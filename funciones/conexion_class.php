@@ -14,7 +14,7 @@ class class_mysqli{
 	public $mac_address_autorizado="00-13-D3-F3-89-BB"; // lap:0A-00-27-00-00-10 | ale: 00-E0-81-5A-F0-A0
 	private $mysqldump = 'F:\xampp\mysql\bin\mysqldump.exe ';
 	// $this->conn_mysqli->error
-	function __construct($localhost='localhost', $usr='root', $pwd='', $db='pventa_almacen'){
+	function __construct($localhost='localhost', $usr='root', $pwd='root', $db='pventa_almacen'){
 	//function __construct($localhost='localhost', $usr='codig915_pventaA', $pwd='zczs35ky43', $db='codig915_pventa'){	
 	//function __construct($localhost='localhost', $usr='pastel11_pventa', $pwd='zczs35ky43', $db='pastel11_pventa'){
         $this->localhost = $localhost;
