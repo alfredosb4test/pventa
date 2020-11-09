@@ -96,12 +96,16 @@ session_start();
                 	<div class="button_azul" id="btn_maayoreo" style="width:70px; font-size:12px">
                     	<div style="padding-top:20px; width:70px;">Mayoreo</div>
                 	</div> 
-                </td>    
+                </td>  
+            	<td width="70"> 
+                	<div class="button_azul" id="btn_deben" style="width:70px; font-size:12px">
+                    	<div style="padding-top:20px; width:70px;">Deben</div>
+                	</div>                 
+                </td>                    
             	<td width="70"> 
                 	<div class="button_azul hide" id="btn_dvlcion" style="width:70px; font-size:12px">
                     	<div style="padding-top:20px; width:70px;">Dvlcion</div>
                 	</div>                 
-
                 </td>                               
                 <td width="30%"></td>               
                 <td><div class="button_otros" id="btn_generico"><div style="padding-top:6px;">Otros<br /> <span class="font_14">(F4)</span></div></div></td>
@@ -175,33 +179,7 @@ session_start();
     </tr>
     </table>
 </div>      
-<div id="dialog_salida_dinero" style="width:650px; display:none">
-	<table width="99%" border="0">
-        <tr>
-            <td>Seleccione un concepto: </td>
-            <td align="right">
-				<select id="opt_concepto">
-                        <option value="retiro" selected="selected">Retiro</option>
-                        <option value="ingreso">Ingreso</option>
-                </select>             
-            </td>
-        </tr>
-        <tr>
-            <td>Cantidad:</td><td align="right"> <input type="text" id="txt_catidad_retiro" class="text_box" /></td>
-        </tr>               
-        <tr>
-            <td colspan="2"><span class="txt_small_1">Motivo:</span></td>
-        </tr>  
-        <tr>
-            <td colspan="2" align="right">
-            	<textarea id="txt_comentario_retiro" class="text_area" rows="4" cols="45"></textarea>                  
-            </td>
-        </tr>             
-        <tr>
-            <td><div id="txt_motivo_err" style="height:20px;"></div></td>
-        </tr>
-    </table>    
-</div>          
+       
 <div id="dialog_ventas_usr" style="width:650px;display:none">
 	<div id="ajax_ventas_usr" style="height:380px; overflow-y: auto;"></div>
 </div>
@@ -255,3 +233,53 @@ session_start();
     <div id="ajax_generico_err" style="height:30px; font-size:14px; "></div>
     <input type="hidden" id="txt_id_prod"  />
 </div>
+<!-- *************************** Retiros *************************** -->
+<div id="dialog_salida_dinero" style="width:650px; display:none">
+	<table width="99%" border="0">
+        <tr>
+            <td>Seleccione un concepto: </td>
+            <td align="right">
+				<select id="opt_concepto">
+                        <option value="retiro" selected="selected">Retiro</option>
+                        <option value="ingreso">Ingreso</option>
+                </select>             
+            </td>
+        </tr>
+        <tr>
+            <td>Cantidad:</td><td align="right"> <input type="number" id="txt_catidad_retiro" class="text_box" /></td>
+        </tr>               
+        <tr>
+            <td colspan="2"><span class="txt_small_1">Motivo:</span></td>
+        </tr>  
+        <tr>
+            <td colspan="2" align="right">
+            	<textarea id="txt_comentario_retiro" class="text_area" rows="4" cols="45"></textarea>                  
+            </td>
+        </tr>             
+        <tr>
+            <td><div id="txt_motivo_err" style="height:20px;"></div></td>
+        </tr>
+    </table>    
+</div>   
+<!-- *************************** DEBEN *************************** -->
+<div id="dialog_deben" style="width:1300px; display:none">
+	<table width="99%" border="1">
+        <tr>
+            <td>Nombre:</td><td align="left"> <input type="text" id="txt_nombre_deben" class="text_box" size="35"  /></td>
+        </tr>  
+        <tr>
+            <td>Cantidad:</td><td align="left"> <input type="number" id="txt_catidad_deben" class="text_box" size="3" maxlength="8" /></td>
+        </tr>  
+        <tr>
+            <td colspan="2"><span class="txt_small_1">Nota:</span></td>
+        </tr>  
+        <tr>
+            <td colspan="2" align="left">
+            	<textarea id="txt_comentario_deben" class="text_area" rows="4" cols="45"></textarea>                  
+            </td>
+        </tr>             
+        <tr>
+            <td><div id="txt_deben_err" style="height:20px;"></div></td>
+        </tr>
+    </table>    
+</div>   

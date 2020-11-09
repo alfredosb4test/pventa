@@ -99,6 +99,7 @@ $(document).ready(function(e) {
 		   data: "accion=ventas_usuario&fecha="+$fecha+"&fecha2="+$fecha2,	// ventas_usuario_x_prod		ventas_usuario
 		   beforeSend:function(){ /* $("#ajax_respuesta").html($load); */ },	 
 		   success: function(datos){
+				//console.log(datos);
 				$("#ajax_pedidos_usr").html(datos);
 				$("#ajax_respuesta").empty();	
  							 							 			

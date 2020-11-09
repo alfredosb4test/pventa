@@ -56,47 +56,8 @@ function img_mouseenter(event){
 }
  
 $(document).ready(function(e) {  
-
-
-/* 	$(document).on( 'click', '.thumbnail-item', function(){
-		// Get all the thumbnail
-		alert("1")
-		$('div.thumbnail-item').mouseenter(function(e) {
-		
-		 // Calculate the position of the image tooltip
-		 x = e.pageX - $(this).offset().left;
-		 y = e.pageY - $(this).offset().top;
-		
-		 // Set the z-index of the current item,
-		 // make sure it's greater than the rest of thumbnail items
-		 // Set the position and display the image tooltip
-		 $(this).css('z-index','15')
-		 .children("div.tooltip")
-		 .css({'top': y + 10,'left': x + 20,'display':'block'});
-		   
-		}).mousemove(function(e) {
-		   
-		 // Calculate the position of the image tooltip  
-		 x = e.pageX - $(this).offset().left;
-		 y = e.pageY - $(this).offset().top;
-		   
-		 // This line causes the tooltip will follow the mouse pointer
-		 $(this).children("div.tooltip").css({'top': y + 10,'left': x + 20});
-		   
-		}).mouseleave(function() {
-		   
-		 // Reset the z-index and hide the image tooltip
-		 $(this).css('z-index','1')
-		 .children("div.tooltip")
-		 .animate({"opacity": "hide"}, "fast");
-		});
-		
-	   });
- */
-
-
 	$altura = $(window).height();
-	$("#ajax_items_add").css("height",($altura-167));
+	$("#ajax_items_add").css("height",($altura-187));
     $("#txt_cj_codigo, #recibe, #txt_cj_nombre").bind('keydown.ctrl_j', function (evt) { 
         return false;
 	});
@@ -353,6 +314,48 @@ $(document).ready(function(e) {
 		  });					  	
 	});	
 	
+
+
+	
+	//****************************************************** DEBEN
+	$('#btn_deben').click(function(){
+		$('#txt_nombre_deben, #txt_catidad_deben, #txt_comentario_deben').attr("value","");	
+		$.ajax({
+		 type: "POST",
+		 contentType: "application/x-www-form-urlencoded", 
+		 url: 'crud_pventas.php',
+		 data: "accion=deben_usuario",
+		 beforeSend:function(){ /* $("#ajax_respuesta").html($load); */ },	 
+		 success: function(datos){  
+			  $("#ajax_respuesta").empty();	
+			  $("#dialog_deben").dialog({
+				  width: 440,
+				  resizable: false,
+				  show: { effect: "blind", pieces: 8, duration: 10 },
+				  title: "Queda a deber",
+				  close: function( event, ui ) {  
+						 $('#txt_cj_codigo').focus();	
+				   },
+				  buttons: {					  
+					Cancelar: function() {
+						//$("#popup_contenido, #ajax_respuesta, #cambio_cliente").empty();
+						$( this ).dialog( "close" );
+					},
+					'Ver Pendientes': function() {
+						//$("#popup_contenido, #ajax_respuesta, #cambio_cliente").empty();
+						$( this ).dialog( "close" );
+					}
+				  }
+			  });								 							 			
+		 },
+		 timeout:90000,
+		 error: function(){ 					
+				$("#ajax_respuesta").html('Problemas con el servidor intente de nuevo.');
+			}	   
+		});					  	
+  });	
+  
+
 	//****************************************************** DEVOLUCION PRODUCTO
 	$('#btn_dvlcion').click(function(){
 		$("#ajax_dvlcion, #ajax_dvlcion_err").empty();

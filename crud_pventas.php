@@ -683,6 +683,9 @@ if(array_key_exists("accion", $_POST) && $_POST['accion']=='ventas_usuario'){
 		if($result->num_rows){	
 			$tbl_completa = "";
 			while ($row = $result->fetch_assoc()) {
+				if( $row["id_productos"] == '')
+					continue;
+
 				$row["mes1"] = $conn->damemes($row["mes1"]);
 				$row["fecha"] = '<span class="t_italic">'.$row["dia1"].' de '.$row["mes1"].' del '.$row["anio1"].' '.$row["hrs1"].'</span>';				
 				$array_id_prod = explode(",",$row["id_productos"]);
@@ -694,6 +697,7 @@ if(array_key_exists("accion", $_POST) && $_POST['accion']=='ventas_usuario'){
 				$ganancias = explode(",",$row["ganancias"]);
 				$total_ganancia_x_dia = $total_ganancia_x_dia+$row["total_ganancia"];
 				$card = $row["card"];
+				
 				if($card != "")
 					$tipo_pago = 'Pago con Tarjeta  
 									<img src="images/t_'.$card.'.png" height="22" width="28" style="position: relative; margin-top:0px">
