@@ -263,12 +263,12 @@ session_start();
 </div>   
 <!-- *************************** DEBEN *************************** -->
 <div id="dialog_deben" style="width:1300px; display:none">
-	<table width="99%" border="1">
+	<table width="99%" border="0">
         <tr>
             <td>Nombre:</td><td align="left"> <input type="text" id="txt_nombre_deben" class="text_box" size="35"  /></td>
         </tr>  
         <tr>
-            <td>Cantidad:</td><td align="left"> <input type="number" id="txt_catidad_deben" class="text_box" size="3" maxlength="8" /></td>
+            <td>Cantidad:</td><td align="left"> <input type="number" id="txt_catidad_deben" class="text_box" style="width:57px;" maxlength="8" /></td>
         </tr>  
         <tr>
             <td colspan="2"><span class="txt_small_1">Nota:</span></td>
@@ -277,9 +277,13 @@ session_start();
             <td colspan="2" align="left">
             	<textarea id="txt_comentario_deben" class="text_area" rows="4" cols="45"></textarea>                  
             </td>
-        </tr>             
+        </tr>                    
         <tr>
             <td><div id="txt_deben_err" style="height:20px;"></div></td>
         </tr>
     </table>    
 </div>   
+<!-- *************************** DEBEN LISTA *************************** -->
+<div id="dialog_deben_lista" style="width:650px;display:none">
+	<div id="ajax_deben_lista" style="height:380px; overflow-y: auto;"></div>
+</div>

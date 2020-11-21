@@ -278,6 +278,7 @@ $(document).ready(function(e) {
 			  }	   
 		  });					  	
 	});
+	
 	//****************************************************** HISTORIAL PAGOS
 	$('#btn_pagos_realizados').click(function(){
 		  $fecha = $("#f_inicial").val();
@@ -319,41 +320,111 @@ $(document).ready(function(e) {
 	
 	//****************************************************** DEBEN
 	$('#btn_deben').click(function(){
-		$('#txt_nombre_deben, #txt_catidad_deben, #txt_comentario_deben').attr("value","");	
+		$('#txt_nombre_deben, #txt_catidad_deben, #txt_comentario_deben').attr("value","");
+		$('#txt_nombre_deben, #txt_catidad_deben').removeClass('text_box_alert').addClass('text_box');
+		$("#dialog_deben").dialog({
+			width: 440,
+			resizable: false,
+			show: { effect: "blind", pieces: 8, duration: 10 },
+			title: "Pendiente de Pago",
+			close: function( event, ui ) {  
+				   $('#txt_cj_codigo').focus();	
+			 },
+			buttons: {					  
+			  Cancelar: function() {
+				  $( this ).dialog( "close" );
+			  },
+			  'Pendientes': function() {
+				  $( this ).dialog( "close" );
+				  debenLista('debe');
+			  },
+			  'Pagados': function() {
+				  $( this ).dialog( "close" );
+				  debenLista('pagado');
+			  },
+			  Guardar: function() {
+				error = 0;
+				$nombre_deben = $("#txt_nombre_deben").val(); 
+				$catidad_deben = $("#txt_catidad_deben").val(); 
+				$comentario_deben = $("#txt_comentario_deben").val(); 
+				console.log($nombre_deben);
+				valida_campo2(["txt_nombre_deben", "txt_catidad_deben"],'','','',["txt_nombre_deben","txt_catidad_deben"], ["#FFD13A"], ["#E6FACB"]);			
+				if(error){
+					//$('#txt_nombre_deben').focus();		
+					return;
+				}					  
+				console.log($nombre_deben);
+				$.ajax({
+				type: "POST",
+				contentType: "application/x-www-form-urlencoded", 
+				url: 'crud_pventas.php',
+				data: "accion=debe_usuario&comentario_deben="+$comentario_deben+"&catidad_deben="+$catidad_deben+'&nombre_deben='+$nombre_deben+'&rd='+Math.random(),
+				beforeSend:function(){ /* $("#ajax_respuesta").html($load); */ },	 
+				success: function(datos){ 
+						// console.log("test1 "+datos);					   		
+						var obj = jQuery.parseJSON(datos);	
+						 
+						if(obj.status == "ok"){
+							$("#ajax_respuesta").empty();
+							$("#dialog_deben").dialog( "close" );
+							$('#txt_cj_codigo').focus();
+						}
+						//$("#popup_contenido").append($sql);							
+				},
+				timeout:90000,
+				error: function(){ 					
+						$("#ajax_respuesta").html('Problemas con el servidor intente de nuevo.');
+					}	   
+				});
+			  }
+			}
+		});								 							 			
+						 
+  });	
+	//****************************************************** LISTAR DEBEN
+	function debenLista($estatus){
+		$fecha = $("#f_inicial").val();
+		//alert($fecha)
 		$.ajax({
 		 type: "POST",
 		 contentType: "application/x-www-form-urlencoded", 
 		 url: 'crud_pventas.php',
-		 data: "accion=deben_usuario",
+		 data: "accion=debenLista&fecha="+$fecha+"&estatus="+$estatus,
 		 beforeSend:function(){ /* $("#ajax_respuesta").html($load); */ },	 
-		 success: function(datos){  
-			  $("#ajax_respuesta").empty();	
-			  $("#dialog_deben").dialog({
-				  width: 440,
-				  resizable: false,
-				  show: { effect: "blind", pieces: 8, duration: 10 },
-				  title: "Queda a deber",
-				  close: function( event, ui ) {  
-						 $('#txt_cj_codigo').focus();	
-				   },
-				  buttons: {					  
+		 success: function(datos){ 
+			$("#ajax_deben_lista").html(datos);
+			$("#ajax_respuesta").empty();	
+			$("#dialog_deben_lista").dialog({
+				width: 850,
+				resizable: false,
+				show: { effect: "blind", pieces: 8, duration: 10 },
+				title: "Clientes que deben",
+				close: function( event, ui ) {  
+					$( this ).dialog( "close" );
+				},
+				buttons: {	
+					Regresar: function() {
+						$("#dialog_deben").dialog( "open" );
+						$( this ).dialog( "close" );
+					},				  
 					Cancelar: function() {
 						//$("#popup_contenido, #ajax_respuesta, #cambio_cliente").empty();
 						$( this ).dialog( "close" );
-					},
-					'Ver Pendientes': function() {
-						//$("#popup_contenido, #ajax_respuesta, #cambio_cliente").empty();
-						$( this ).dialog( "close" );
 					}
-				  }
-			  });								 							 			
+				}
+			});								 							 			
 		 },
 		 timeout:90000,
 		 error: function(){ 					
 				$("#ajax_respuesta").html('Problemas con el servidor intente de nuevo.');
 			}	   
 		});					  	
-  });	
+  }
+  
+
+
+
+
   
 
 	//****************************************************** DEVOLUCION PRODUCTO
@@ -1052,3 +1123,28 @@ function actualiza_devo_confirm(id_ventas_cajas){
 		}
 	});	
 }
+
+ 	//****************************************************** ACTUALIZAR DEBEN
+	 function actualiza_deben($id, $estatus){
+		$.ajax({
+			type: "POST",
+			contentType: "application/x-www-form-urlencoded", 
+			url: 'crud_pventas.php',
+			data: "accion=debenUpdate&id="+$id+"&estatus="+$estatus,
+			beforeSend:function(){ /* $("#ajax_respuesta").html($load); */ },	 
+			success: function(datos){ 
+				var obj = jQuery.parseJSON(datos);	
+				//console.log(obj);
+				if(obj.status == "ok"){
+					$("#ajax_respuesta").empty();
+					$("#debe_"+$id).remove(); 
+				}else{
+					$("#ajax_deben_lista").html('<div class="msg alerta_err">Problemas con el servidor.</div>')
+				}		 							 			
+			},
+			timeout:90000,
+			error: function(){ 					
+					$("#ajax_respuesta").html('Problemas con el servidor intente de nuevo.');
+				}	   
+			});
+		}

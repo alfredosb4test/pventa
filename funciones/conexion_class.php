@@ -634,6 +634,35 @@ class class_mysqli{
 			return '{"status":"error_sql"}';
 		$result->close();
 	}
+	function insert_usr_debe($id_empresa, $id_sucursal, $sucursal, $NumEmp, $nombre_empleado, $nombre_deben, $cantidad_deben,$comentario_deben){
+		$fecha = date('Y-m-d H:i:s');
+		$estatus = 'debe';
+		if($result = $this->conn_mysqli->prepare("INSERT INTO tbl_deben (id_empresa, id_sucursal, sucursal, NumEmp, nombre_empleado, nombre, cantidad, nota, fecha, estatus) VALUES (?,?,?,?,?,?,?,?,?,?)")) {		 
+			if($result->bind_param("iisissdsss",$id_empresa, $id_sucursal, $sucursal, $NumEmp, $nombre_empleado, $nombre_deben, $cantidad_deben, $comentario_deben, $fecha, $estatus)){
+				if($result->execute()){
+				 	return '{"status":"ok"}';
+				}else
+					return '{"status":"error_execute"}';	// $result->error;  //
+			}else
+				return '{"status":"error_parametros"}';
+		}else
+			return '{"status":"error_sql"}';
+		$result->close();
+	}
+	function debenUpdate($id){
+		$estatus = 'pagado';
+		if($result = $this->conn_mysqli->prepare("UPDATE tbl_deben SET estatus = ?  WHERE id = ?")) {		 
+			if( $result->bind_param("si", $estatus, $id) ){
+				if( $result->execute() ){
+					return '{"status":"ok"}';
+				}else
+					return '{"tipo":"error_execute"}';
+			}else
+				return '{"tipo":"error_parametros"}';
+		}else
+			return '{"tipo":"error_sql"}';	
+	}
+
 /*******************************************************************************************************************/
 /*************************************************  CLIENTES   *****************************************************/
 /*******************************************************************************************************************/

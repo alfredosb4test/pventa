@@ -648,6 +648,102 @@ if(array_key_exists("accion", $_POST) && $_POST['accion']=='salida_dinero'){
 	echo $resul = $conn->insert_retiro_ingreso_caja($_SESSION['g_id_empresa'], $_SESSION['g_id_sucursal'], $_SESSION['g_sucursal'], $_SESSION['g_NumEmp'], $_SESSION['g_nombre'], $concepto, $catidad_retiro,$comentario_retiro);
 }
 
+if(array_key_exists("accion", $_POST) && $_POST['accion']=='debe_usuario'){	
+	$conn = new class_mysqli();
+	$_POST = $conn->sanitize($_POST);
+	$comentario_deben = $_POST['comentario_deben'];
+	$catidad_deben = $_POST['catidad_deben']; 
+	$nombre_deben = $_POST['nombre_deben']; 
+	echo $resul = $conn->insert_usr_debe($_SESSION['g_id_empresa'], $_SESSION['g_id_sucursal'], $_SESSION['g_sucursal'], $_SESSION['g_NumEmp'], $_SESSION['g_nombre'], $nombre_deben, $catidad_deben, $comentario_deben);
+}
+
+
+if(array_key_exists("accion", $_POST) && $_POST['accion']=='debenLista'){	
+	$conn = new class_mysqli();
+	$estatus = $_POST['estatus'];
+
+	if($_POST['fecha'])
+		$fecha = $_POST['fecha'];
+	else
+		$fecha = date("Y-m-d");
+
+	if($_POST['fecha2'])
+		$fecha2 = $_POST['fecha2'];
+	else
+		$fecha2 = date("Y-m-d");
+	//DATE_FORMAT(fecha,'%Y-%m-%d')  BETWEEN '$fecha' AND '$fecha2' 
+		$sql = "SELECT *, DATE_FORMAT(fecha, '%m') AS mes1,
+				DATE_FORMAT(fecha, '%d') AS dia1,DATE_FORMAT(fecha, '%Y') AS anio1,
+				DATE_FORMAT(fecha, '%h:%i %p') AS hrs1
+				FROM `tbl_deben` WHERE estatus = '$estatus' AND id_empresa = ".$_SESSION['g_id_empresa']." ORDER BY fecha DESC";
+
+	//echo "$sql <hr>";		// AND id_productos IN (1236)
+	
+	if($result = $conn->conn_mysqli->query($sql)){
+		if($result->num_rows){	
+			$tbl_completa = "";
+			$cont = 0;
+			while ($row = $result->fetch_assoc()) {
+				$cont++;
+
+				if( $estatus == 'debe' ){
+					$btn_pagar = '
+					<div class="button_caja" id="btn_par_deben" onclick="actualiza_deben('.$row["id"].', \'pagado\')" style="width:60px; height:25px; font-size:12px">
+						<div style="padding-top:7px; width:60px;">Cobrar</div>
+					</div> ';
+				}else{
+					$btn_pagar = '';
+				}
+								
+				$row["cantidad"] = number_format($row["cantidad"],2);
+				$row["mes1"] = $conn->damemes($row["mes1"]);
+				$row["fecha"] = '<span class="t_italic">'.$row["dia1"].' de '.$row["mes1"].' del '.$row["anio1"].' '.$row["hrs1"].'</span>';
+
+				if($cont%2)
+					$clase = ' f_verde2_ventas ';
+				else
+					$clase = ' f_verde1_ventas ';
+
+				$tabla_1 = '<table id="debe_'.$row["id"].'" 
+				border="0" width="100%" cellspacing="0" class="'.$clase.' btop2 bbottom2 bright2 bleft2">
+				<tr class=" t_negro">
+					<td width="90"><span class="negritas t_negro">Fecha:</span></td>
+					<td width="70%"><span class=" t_negro">'.$row["fecha"].'</span></td>
+					
+					<td rowspan="2" align="right" width="90"><p>Cantidad</p></td>
+
+					<td rowspan="2" align="right"><span class="negritas t_rojo">$'.$row["cantidad"].'</span></td>
+				</tr>
+				<tr class="t_negro">
+					<td width="90"><span class="negritas t_negro">Nombre:</span></td>
+					<td width="70%"><span class=" t_negro">'.$row["nombre"].'</span></td>
+				</tr>
+				<tr class="t_negro">
+					<td width="90"><span class="negritas t_negro">Nota:</span></td>
+					<td width="70%" colspan="2"><span class=" t_negro">'.$row["nota"].'</span></td>
+					<td width="90" align="right"> 
+						'.$btn_pagar.'
+					</td>
+				</tr>';
+				
+			
+				$tbl_completa .= $tabla_1."<br>";	
+			}
+			echo $tbl_completa;
+		}else{
+			echo '<div class="msg alerta_err"><strong>Sin Registros</strong></div>';
+		}
+	}
+}
+
+if(array_key_exists("accion", $_POST) && $_POST['accion']=='debenUpdate'){	
+	$conn = new class_mysqli();
+	$_POST = $conn->sanitize($_POST);
+	$id = $_POST['id']; 
+	//echo "OK: $id";
+	echo $conn->debenUpdate($id);
+
+}
 /************************************************************************************************************************************/
 /***********************************************    REPORTE DE VENTAS   *************************************************************/
 /************************************************************************************************************************************/
