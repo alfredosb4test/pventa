@@ -69,6 +69,7 @@ session_start();
       <td><div id="ajax_items_alert" style="position:relative; height:25px; top:-3px;"></div></td>     
   </tr>
 </table>
+<div id="pendientes_prod"></div>
 <div id="ajax_items_add"></div>
 <div id="caja_totales">
 	<div id="" style="position: relative; width:75%; height:70px; display:table; float:left; background-color: #191919">
@@ -100,6 +101,11 @@ session_start();
             	<td width="70"> 
                 	<div class="button_azul" id="btn_deben" style="width:70px; font-size:12px">
                     	<div style="padding-top:20px; width:70px;">Deben</div>
+                	</div>                 
+                </td>
+                <td width="70"> 
+                	<div class="button_azul" id="btn_guardar_list" style="width:70px; font-size:12px">
+                    	<div style="padding-top:20px; width:70px;">Indexar</div>
                 	</div>                 
                 </td>                    
             	<td width="70"> 

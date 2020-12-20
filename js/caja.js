@@ -83,7 +83,9 @@ $(document).ready(function(e) {
             if($ultimo_codigo_prod)
 							del_cantidad($ultimo_codigo_prod); 
     	}
-    });
+	});
+	
+	filePendiente();
 	
  
 
@@ -315,9 +317,6 @@ $(document).ready(function(e) {
 		  });					  	
 	});	
 	
-
-
-	
 	//****************************************************** DEBEN
 	$('#btn_deben').click(function(){
 		$('#txt_nombre_deben, #txt_catidad_deben, #txt_comentario_deben').attr("value","");
@@ -421,12 +420,6 @@ $(document).ready(function(e) {
 		});					  	
   }
   
-
-
-
-
-  
-
 	//****************************************************** DEVOLUCION PRODUCTO
 	$('#btn_dvlcion').click(function(){
 		$("#ajax_dvlcion, #ajax_dvlcion_err").empty();
@@ -1124,27 +1117,77 @@ function actualiza_devo_confirm(id_ventas_cajas){
 	});	
 }
 
- 	//****************************************************** ACTUALIZAR DEBEN
-	 function actualiza_deben($id, $estatus){
-		$.ajax({
-			type: "POST",
+//****************************************************** ACTUALIZAR DEBEN
+function actualiza_deben($id, $estatus){
+	$.ajax({
+		type: "POST",
+		contentType: "application/x-www-form-urlencoded", 
+		url: 'crud_pventas.php',
+		data: "accion=debenUpdate&id="+$id+"&estatus="+$estatus,
+		beforeSend:function(){ /* $("#ajax_respuesta").html($load); */ },	 
+		success: function(datos){ 
+			var obj = jQuery.parseJSON(datos);	
+			//console.log(obj);
+			if(obj.status == "ok"){
+				$("#ajax_respuesta").empty();
+				$("#debe_"+$id).remove(); 
+			}else{
+				$("#ajax_deben_lista").html('<div class="msg alerta_err">Problemas con el servidor.</div>')
+			}		 							 			
+		},
+		timeout:90000,
+		error: function(){ 					
+				$("#ajax_respuesta").html('Problemas con el servidor intente de nuevo.');
+			}	   
+	});
+}
+
+//************************************************************ Guardar pendientes, lista de productos
+$('#btn_guardar_list').click(function(){
+	const productos = [];
+	if ($('.item').length){
+		//$hijos = $("#ajax_items_add").children('div').html();
+		//console.log( $(this) );
+		$(".item").each(function( cont ) {
+			productos.push( $(this).context.outerHTML );				
+		});
+		f = new Date();	
+		fecha = f.getDate() + "-" + (f.getMonth() +1) + "-" + f.getFullYear() + " " + f.getHours() + "-" + f.getMinutes();
+		//productos.push( fecha );
+		console.log("Productos::", productos);
+		console.log("fecha::", fecha);
+		$.ajax({ 
+			url: 'crud_pventas.php', // Url to which the request is send 
 			contentType: "application/x-www-form-urlencoded", 
-			url: 'crud_pventas.php',
-			data: "accion=debenUpdate&id="+$id+"&estatus="+$estatus,
-			beforeSend:function(){ /* $("#ajax_respuesta").html($load); */ },	 
-			success: function(datos){ 
-				var obj = jQuery.parseJSON(datos);	
-				//console.log(obj);
-				if(obj.status == "ok"){
-					$("#ajax_respuesta").empty();
-					$("#debe_"+$id).remove(); 
-				}else{
-					$("#ajax_deben_lista").html('<div class="msg alerta_err">Problemas con el servidor.</div>')
-				}		 							 			
-			},
-			timeout:90000,
-			error: function(){ 					
-					$("#ajax_respuesta").html('Problemas con el servidor intente de nuevo.');
-				}	   
-			});
-		}
+			type: "POST",    // Type of request to be send, called as method 
+			data: "accion=fileCaja&tmpCaja=" + productos+"&fecha="+fecha, // Data sent to server, a set of key/value pairs (i.e. form fields and values) 
+			processData:false,  // To send DOMDocument or non processed data file it is set to false 
+
+			}).done(function(data) { 
+				console.log(data); 
+			}); 
+
+
+
+
+	}
+});
+//************************************************************ Recuperar pendientes, lista de productos
+function filePendiente(){
+	$.ajax({
+		type: "POST",
+		contentType: "application/x-www-form-urlencoded", 
+		url: 'crud_pventas.php',
+		data: "accion=filePendiente",
+		beforeSend:function(){ /* $("#ajax_respuesta").html($load); */ },	 
+		success: function(datos){ 
+			var obj = jQuery.parseJSON(datos);	
+			console.log(obj);
+			 		 							 			
+		},
+		timeout:90000,
+		error: function(){ 					
+				$("#ajax_respuesta").html('Problemas con el servidor intente de nuevo.');
+			}	   
+	});
+}

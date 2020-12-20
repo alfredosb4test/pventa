@@ -1843,5 +1843,34 @@ if(array_key_exists("accion", $_POST) && $_POST['accion']=='backup'){
 	$conn = new class_mysqli();
 	echo $resp = $conn->backup();
 }
+if(array_key_exists("accion", $_POST) && $_POST['accion']=='fileCaja'){
+	$fecha = $_POST['fecha'];
+	$conn = new class_mysqli();
+	$nombre = uniqid();
+	$fh = fopen("pendientes/".$fecha."_".$nombre.".txt", 'w') or die("Se produjo un error al crear el archivo");
+	$texto = $_POST['tmpCaja'];
+	
+	fwrite($fh, $texto) or die("No se pudo escribir en el archivo");
+	
+	fclose($fh);
+}
+if(array_key_exists("accion", $_POST) && $_POST['accion']=='filePendiente'){
+	$conn = new class_mysqli();
+	$filesPen = [];
+	// Abrimos la carpeta que nos pasan como parámetro
+	$dir = opendir("pendientes/");
+	// Leo todos los ficheros de la carpeta
+	while ($elemento = readdir($dir)){
+		// Tratamos los elementos . y .. que tienen todas las carpetas
+		if( $elemento != "." && $elemento != ".."){
+				
+			array_push($filesPen, $elemento);		
+				
+		}
+	}
+	echo json_encode( $filesPen );
+	
+
+}
 $conn->close_mysqli();
 ?> 
