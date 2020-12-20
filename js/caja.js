@@ -18,7 +18,7 @@ function img_mouseenter(event){
 		if(altura_img > 280){
 			y_top = 120;
 		}else{
-			y_top = 10
+			y_top = 10;
 		}
 
 		// Calculate the position of the image tooltip
@@ -1144,18 +1144,18 @@ function actualiza_deben($id, $estatus){
 
 //************************************************************ Guardar pendientes, lista de productos
 $('#btn_guardar_list').click(function(){
-	const productos = [];
+	var productos = '';
 	if ($('.item').length){
 		//$hijos = $("#ajax_items_add").children('div').html();
 		//console.log( $(this) );
 		$(".item").each(function( cont ) {
-			productos.push( $(this).context.outerHTML );				
+			productos += $(this).context.outerHTML;				
 		});
 		f = new Date();	
-		fecha = f.getDate() + "-" + (f.getMonth() +1) + "-" + f.getFullYear() + " " + f.getHours() + "-" + f.getMinutes();
+		fecha = f.getDate() + "-" + (f.getMonth() +1) + "-" + f.getFullYear() + "_" + f.getHours() + "$" + f.getMinutes();
 		//productos.push( fecha );
 		console.log("Productos::", productos);
-		console.log("fecha::", fecha);
+		console.log("fecha:: f.getYear()", f.getYear());
 		$.ajax({ 
 			url: 'crud_pventas.php', // Url to which the request is send 
 			contentType: "application/x-www-form-urlencoded", 
@@ -1164,12 +1164,8 @@ $('#btn_guardar_list').click(function(){
 			processData:false,  // To send DOMDocument or non processed data file it is set to false 
 
 			}).done(function(data) { 
-				console.log(data); 
-			}); 
-
-
-
-
+				console.log('btn_guardar_list', data); 
+			});
 	}
 });
 //************************************************************ Recuperar pendientes, lista de productos
@@ -1178,12 +1174,44 @@ function filePendiente(){
 		type: "POST",
 		contentType: "application/x-www-form-urlencoded", 
 		url: 'crud_pventas.php',
-		data: "accion=filePendiente",
+		data: "accion=filesPendientes",
 		beforeSend:function(){ /* $("#ajax_respuesta").html($load); */ },	 
 		success: function(datos){ 
 			var obj = jQuery.parseJSON(datos);	
 			console.log(obj);
-			 		 							 			
+			if(obj.length){
+				obj.forEach(element => {
+					$nombre = element.split('#');
+					$nombre = $nombre[0].replace('$',':');
+					console.log($nombre);
+					imgBorrar = $('<img>').addClass('borrarListPend').attr('src', 'images/borrar.png');
+					imgBorrar = $('<div></div>').addClass('divImgListProd').append(imgBorrar);
+					$nombre = $("<div onClick=getPendienteList(\'"+element+"\')></div>").addClass('divNomListProd').text($nombre);
+					productos = $('<div></div>').addClass('itemListProd').append(imgBorrar).append($nombre);
+					$('#pendientes_prod').append(productos);					
+				});
+				
+			}	 							 			
+		},
+		timeout:90000,
+		error: function(){ 					
+				$("#ajax_respuesta").html('Problemas con el servidor intente de nuevo.');
+			}	   
+	});
+}
+function getPendienteList ( fileTxt){
+	console.log(fileTxt);
+	$.ajax({
+		type: "POST",
+		contentType: "application/x-www-form-urlencoded", 
+		url: 'crud_pventas.php',
+		data: "accion=filePendiente&fileTxt="+fileTxt,
+		beforeSend:function(){ /* $("#ajax_respuesta").html($load); */ },	 
+		success: function(datos){ 
+			//var obj = jQuery.parseJSON(datos);	
+			console.log(datos);
+			$("#ajax_items_add").empty().html(datos);
+			calcular_totales();
 		},
 		timeout:90000,
 		error: function(){ 					

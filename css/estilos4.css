@@ -1092,6 +1092,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f8fff7', end
 	background-color: #FFF;
 	border:#003 3px solid;
 	overflow-y: auto;  	
+	clear: both;
 }
 .item{
 	border-bottom: #000 1px solid;
@@ -1178,4 +1179,34 @@ div.growlUI {
 	 width: 350px;
 	 height: 200px;
 	}
-   
+	 
+.itemListProd{
+	position: relative;
+	width: 120px;
+	height: 20px;
+	font-size: 12px;
+	background-color: #aaf39a;
+	float: left;
+	align-items: center;
+	justify-content: flex-end;
+	display: flex;
+	padding: 3px;
+	margin-left: 1px;
+	border-radius: 0px 10px 0 0;
+}
+
+.divImgListProd{
+	position: relative;
+	width: 22px;
+	margin: 1px 0px 0 0px;
+	cursor: pointer;
+}
+.borrarListPend{
+	width: 23px;
+	position: absolute;
+	margin: -12px 0 0 -7px;
+}
+
+.divNomListProd{
+	padding: 5px;
+}

@@ -1847,14 +1847,15 @@ if(array_key_exists("accion", $_POST) && $_POST['accion']=='fileCaja'){
 	$fecha = $_POST['fecha'];
 	$conn = new class_mysqli();
 	$nombre = uniqid();
-	$fh = fopen("pendientes/".$fecha."_".$nombre.".txt", 'w') or die("Se produjo un error al crear el archivo");
+	$fh = fopen("pendientes/".$fecha."#".$nombre.".txt", 'w') or die("Se produjo un error al crear el archivo");
+	echo $_POST['tmpCaja'];
 	$texto = $_POST['tmpCaja'];
-	
+
 	fwrite($fh, $texto) or die("No se pudo escribir en el archivo");
 	
 	fclose($fh);
 }
-if(array_key_exists("accion", $_POST) && $_POST['accion']=='filePendiente'){
+if(array_key_exists("accion", $_POST) && $_POST['accion']=='filesPendientes'){
 	$conn = new class_mysqli();
 	$filesPen = [];
 	// Abrimos la carpeta que nos pasan como parámetro
@@ -1863,13 +1864,24 @@ if(array_key_exists("accion", $_POST) && $_POST['accion']=='filePendiente'){
 	while ($elemento = readdir($dir)){
 		// Tratamos los elementos . y .. que tienen todas las carpetas
 		if( $elemento != "." && $elemento != ".."){
-				
-			array_push($filesPen, $elemento);		
-				
+			array_push($filesPen, $elemento);
 		}
 	}
 	echo json_encode( $filesPen );
-	
+}
+if(array_key_exists("accion", $_POST) && $_POST['accion']=='filePendiente'){
+	$conn = new class_mysqli();
+	$nombreFile = $_POST['fileTxt'];
+	$fp = fopen("pendientes/".$nombreFile,"r");
+	while(!feof($fp)) {
+
+		$linea = fgets($fp);
+		
+		//$linea . "<br />";
+		
+	}
+	echo $linea;
+	fclose($fp);
 
 }
 $conn->close_mysqli();
