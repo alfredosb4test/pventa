@@ -10,7 +10,8 @@ var $img = "";
 var $card = "";
 var $ultimo_codigo_prod = "";
 var $cont_generico = 0;	// lleva un conteo para cada producto generico agregado
- 
+var $itemRecuperados = false; // si la lista es recuperada  de un pendiente es true
+var $fileItemsPend = ''; // almacena el nombre del archivo de listado pendientes en caja
 function img_mouseenter(event){
 	console.log("event img_mouseenter")
 	$(event).mouseenter(function(e) {
@@ -634,7 +635,11 @@ $(document).ready(function(e) {
 					 // $( this ).dialog( "close" );
 					  $aprobacion_card = $("#txt_aprobacion_card").val();
 					  if($aprobacion_card == "")
-					  	$card = "";
+							$card = "";
+							
+						if( $itemRecuperados ){
+							eliminarItemsPend( $fileItemsPend );
+						}
 					  //alert($card+" | "+$aprobacion_card)
 					  $.ajax({
 					   type: "POST",
@@ -643,17 +648,21 @@ $(document).ready(function(e) {
 					   data: "accion=update_productos&array_id="+$array_id+"&array_cantidad="+$array_cantidad+'&array_cantidad_solicitada='+$array_cantidad_solicitada+'&array_precio_prod='+$array_precio_prod+'&array_ganancia_prod='+$array_ganancia_prod+'&ganancia_total='+$ganancia_total+'&total='+$total+'&card='+$card+'&aprobacion_card='+$aprobacion_card+'&nombre_genericos='+$JSON_nomb_generico+'&rd='+Math.random(),
 					   beforeSend:function(){ /* $("#ajax_respuesta").html($load); */ },	 
 					   success: function(datos){ 
-					   //
+						 //	
+								console.log(datos);
 					   		var obj = jQuery.parseJSON(datos);	
-						   	if(obj.status == "ok_update"){
-								 $("#ajax_respuesta, #ajax_items_add, #ajax_items_alert").empty();
-								 $("#subTotal, #total").html("");
-								 $("#dialog_detalles").dialog( "close" );
-								 $('#txt_cj_codigo').focus();
-								 $aprobacion_card = "";
-								 $img = "";
-								 $("#icon_card").attr("src", "");
-							}
+						   	if(obj.status == "ok_insert"){
+									$("#ajax_respuesta, #ajax_items_add, #ajax_items_alert").empty();
+									$("#subTotal, #total").html("");
+									$("#dialog_detalles").dialog( "close" );
+									$('#txt_cj_codigo').focus();
+									$aprobacion_card = "";
+									$img = "";
+									$("#icon_card").attr("src", "");
+								}
+								if(obj.status == "error"){
+									console.log("error update.insert");
+								}
 						   	//$("#popup_contenido").append($sql);							
 					   },
 					   timeout:90000,
@@ -924,6 +933,9 @@ function calcular_totales_mayoreo(){
 function del_item(id_item){
 	$("#"+id_item).remove();
 	$ultimo_codigo_prod = "";
+	if( $('.item').length <= 0 ){
+		$itemRecuperados = false;
+	}
 	calcular_totales();
 }
 
@@ -1154,8 +1166,6 @@ $('#btn_guardar_list').click(function(){
 		f = new Date();	
 		fecha = f.getDate() + "-" + (f.getMonth() +1) + "-" + f.getFullYear() + "_" + f.getHours() + "$" + f.getMinutes();
 		//productos.push( fecha );
-		console.log("Productos::", productos);
-		console.log("fecha:: f.getYear()", f.getYear());
 		$.ajax({ 
 			url: 'crud_pventas.php', // Url to which the request is send 
 			contentType: "application/x-www-form-urlencoded", 
@@ -1164,11 +1174,15 @@ $('#btn_guardar_list').click(function(){
 			processData:false,  // To send DOMDocument or non processed data file it is set to false 
 
 			}).done(function(data) { 
-				console.log('btn_guardar_list', data); 
+				console.log('btn_guardar_list -> archivo guardado'); 
+				$(".item").fadeOut('fast');
+				setTimeout(()=>{ $("#ajax_items_add").empty(); },1000);
+				
+				filePendiente();
 			});
 	}
 });
-//************************************************************ Recuperar pendientes, lista de productos
+//*********************************************** Recuperar pendientes, lista de productos mostralos en tabs
 function filePendiente(){
 	$.ajax({
 		type: "POST",
@@ -1180,15 +1194,17 @@ function filePendiente(){
 			var obj = jQuery.parseJSON(datos);	
 			console.log(obj);
 			if(obj.length){
+				$('#pendientes_prod').empty();
 				obj.forEach(element => {
-					$nombre = element.split('#');
-					$nombre = $nombre[0].replace('$',':');
+					$nombreArr = element.split('#');
+					$nombre = $nombreArr[0].replace('$',':');
+					$idItemBorrar = $nombreArr[1].replace('.','');
 					console.log($nombre);
-					imgBorrar = $('<img>').addClass('borrarListPend').attr('src', 'images/borrar.png');
+					imgBorrar = $("<img onClick=eliminarItemsPend(\'"+element+"\')>").addClass('borrarListPend').attr('src', 'images/borrar.png');
 					imgBorrar = $('<div></div>').addClass('divImgListProd').append(imgBorrar);
 					$nombre = $("<div onClick=getPendienteList(\'"+element+"\')></div>").addClass('divNomListProd').text($nombre);
-					productos = $('<div></div>').addClass('itemListProd').append(imgBorrar).append($nombre);
-					$('#pendientes_prod').append(productos);					
+					productos = $('<div></div>').addClass('itemListProd').attr('id', $idItemBorrar).append(imgBorrar).append($nombre);
+					$('#pendientes_prod').append(productos); 		
 				});
 				
 			}	 							 			
@@ -1199,8 +1215,11 @@ function filePendiente(){
 			}	   
 	});
 }
+// ****************************** Recuperar los productos y ponerlos en caja para cobrar o agregar mas items 
 function getPendienteList ( fileTxt){
 	console.log(fileTxt);
+	$itemRecuperados = true;
+	$fileItemsPend = fileTxt; 
 	$.ajax({
 		type: "POST",
 		contentType: "application/x-www-form-urlencoded", 
@@ -1208,8 +1227,6 @@ function getPendienteList ( fileTxt){
 		data: "accion=filePendiente&fileTxt="+fileTxt,
 		beforeSend:function(){ /* $("#ajax_respuesta").html($load); */ },	 
 		success: function(datos){ 
-			//var obj = jQuery.parseJSON(datos);	
-			console.log(datos);
 			$("#ajax_items_add").empty().html(datos);
 			calcular_totales();
 		},
@@ -1218,4 +1235,56 @@ function getPendienteList ( fileTxt){
 				$("#ajax_respuesta").html('Problemas con el servidor intente de nuevo.');
 			}	   
 	});
+}
+
+function eliminarItemsPend( $fileItemsPend ){
+	$nombreArr = $fileItemsPend.split('#');
+	$idItemBorrar = $nombreArr[1].replace('.','');
+	console.log("fileItemsPend::", $idItemBorrar)
+
+	$("#dialog_del_pendientes").dialog({
+		width: 450,
+		resizable: false,
+		show: { effect: "blind", pieces: 8, duration: 10 },
+		title: "Lista Pendiente",
+		close: function( event, ui ) {  
+			$( this ).dialog( "close" );
+		},
+		buttons: {	
+			Aceptar: function() {
+				$.ajax({
+					type: "POST",
+					contentType: "application/x-www-form-urlencoded", 
+					url: 'crud_pventas.php',
+					data: "accion=filePendienteDel&fileTxt="+$fileItemsPend,
+					beforeSend:function(){ /* $("#ajax_respuesta").html($load); */ },	 
+					success: function(datos){ 
+						console.log(datos);
+						var obj = jQuery.parseJSON(datos);	
+						//console.log(obj);
+						if(obj.status == "ok_del"){
+							$("#"+ $idItemBorrar).animate({ opacity: .4 }, 200, "linear", function() { $("#"+ $idItemBorrar).remove(); } );
+							$("#dialog_del_pendientes").dialog( "close" );
+							if( $itemRecuperados ){
+								$("#ajax_items_add").empty();
+							}
+							$itemRecuperados = false;
+						}else{
+							console.log("error al elimina el archivo");
+						}
+					},
+					timeout:90000,
+					error: function(){ 					
+							$("#ajax_respuesta").html('Problemas con el servidor intente de nuevo.');
+						}	   
+				});
+			},				  
+			Cancelar: function() {
+				//$("#popup_contenido, #ajax_respuesta, #cambio_cliente").empty();
+				$( this ).dialog( "close" );
+			}
+		}
+	});	
+
+
 }

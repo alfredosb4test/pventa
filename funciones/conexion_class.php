@@ -594,16 +594,16 @@ class class_mysqli{
 	}	
 	
 	function insert_venta_caja($id_empresa, $id_sucursal, $sucursal, $NumEmp, $nombre_empleado, $id_productos, $cantidades, $array_precio_prod, $ganancias, $total, $ganancia_total, $card, $aprobacion_card, $nombre_genericos){
-		if($result = $this->conn_mysqli->prepare("INSERT INTO tbl_ventas_caja (id_empresa, id_sucursal, sucursal, NumEmp, nombre_empleado, id_productos, cantidades, precios, ganancias, nombre_genericos, total, total_ganancia, card, aprobacion_card) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)")) {		 
+		if($result = $this->conn_mysqli->prepare("INSERT INTO tbl_ventas_caja (id_empresa, id_sucursal, sucursal, NumEmp, nombre_empleado, id_productos, cantidades, precios, ganancias, nombre_genericos, total, total_ganancia, tarjeta, aprobacion_card) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)")) {		 
 			if($result->bind_param("iisissssssddss",$id_empresa, $id_sucursal, $sucursal, $NumEmp, $nombre_empleado, $id_productos, $cantidades, $array_precio_prod, $ganancias, $nombre_genericos, $total, $ganancia_total, $card, $aprobacion_card)){
 				if($result->execute()){
-				 	return '{"tipo":"venta_registrada"}';
+				 	return '{"status":"ok_insert"}';
 				}else
-					return '{"tipo":"error_execute"}';	// $result->error;  //
+					return '{"status":"error"}';	// $this->conn_mysqli->error  //
 			}else
-				return '{"tipo":"error_parametros"}';
+				return '{"status":"error"}';
 		}else
-			return '{"tipo":"error_sql"}';
+			return '{"status":"error"}';
 		$result->close();		
 	}	
 	

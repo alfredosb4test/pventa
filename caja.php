@@ -293,3 +293,13 @@ session_start();
 <div id="dialog_deben_lista" style="width:650px;display:none">
 	<div id="ajax_deben_lista" style="height:380px; overflow-y: auto;"></div>
 </div>
+
+
+<div id="dialog_del_pendientes" style="width:450px;display:none">
+    <table>
+        <tr>
+            <td width="200">Eliminar lista pendiente?</td> 
+        </tr>
+
+    </table>
+</div>    

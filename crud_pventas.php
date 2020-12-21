@@ -529,6 +529,7 @@ if(array_key_exists("accion", $_POST) && $_POST['accion']=='update_productos'){
 	$ids = $_POST['array_id']; 
 
 	// Descontar cantidades si esta activada esta opcion de lo contrario solo registra la venta
+	$activar_cantidades_error = false;
 	if($_SESSION['activar_cantidades']){ 
 		$sql = "UPDATE tbl_producto SET cantidad = CASE id "; 
 		foreach ($array_ids as $key => $id) {     
@@ -538,21 +539,26 @@ if(array_key_exists("accion", $_POST) && $_POST['accion']=='update_productos'){
 		
 		$conn->conn_mysqli->autocommit(FALSE);
 		if($result = $conn->conn_mysqli->query($sql)){
-			echo '{"status":"ok_update"}';
+			// echo '{"status":"ok_update"}';
 			$conn->conn_mysqli->commit();
 		}else{
-			echo '{"status":"no_update"}';
+			//echo '{"status":"no_update"}';
+			$activar_cantidades_error = true;
 			$conn->conn_mysqli->rollback();
 		}
 		$conn->conn_mysqli->autocommit(TRUE);
-	}else
-		echo '{"status":"ok_update"}';
+	}
+	if($activar_cantidades_error){
+		echo '{"status":"error"}';
+		return;
+	}
 
 	$array_id = $_POST['array_id'];
 	$array_cantidad_solicitada = $_POST['array_cantidad_solicitada'];
 	$array_precio_prod = $_POST['array_precio_prod'];
 	//print_r($_POST);insert_venta_caja($id_empresa, $id_sucursal, $sucursal, 															$NumEmp, $nombre_empleado, $id_productos, $cantidades, 			   $array_precio_prod, $ganancias, $total, $ganancia_total, $card, $aprobacion_card, $nombre_genericos){
-	$resul = $conn->insert_venta_caja($_SESSION['g_id_empresa'], $_SESSION['g_id_sucursal'], $_SESSION['g_sucursal'], $_SESSION['g_NumEmp'], $_SESSION['g_nombre'], $array_id, $array_cantidad_solicitada, $array_precio_prod, $array_ganancia_prod, $total, $ganancia_total, $card, $aprobacion_card, $_POST['nombre_genericos']);
+	echo $resul = $conn->insert_venta_caja($_SESSION['g_id_empresa'], $_SESSION['g_id_sucursal'], $_SESSION['g_sucursal'], $_SESSION['g_NumEmp'], $_SESSION['g_nombre'], $array_id, $array_cantidad_solicitada, $array_precio_prod, $array_ganancia_prod, $total, $ganancia_total, $card, $aprobacion_card, $_POST['nombre_genericos']);
+	
 }
 
 if(array_key_exists("accion", $_POST) && $_POST['accion']=='prod_devolucion'){	
@@ -1882,7 +1888,14 @@ if(array_key_exists("accion", $_POST) && $_POST['accion']=='filePendiente'){
 	}
 	echo $linea;
 	fclose($fp);
-
+}
+if(array_key_exists("accion", $_POST) && $_POST['accion']=='filePendienteDel'){
+	$conn = new class_mysqli();
+	$file = $_POST['fileTxt'];
+	if( unlink("pendientes/".$file) )
+		echo '{"status":"ok_del"}';
+	else
+		echo '{"status":"error"}';	
 }
 $conn->close_mysqli();
 ?> 

@@ -1184,7 +1184,7 @@ div.growlUI {
 	position: relative;
 	width: 120px;
 	height: 20px;
-	font-size: 12px;
+	font-size: 11px;
 	background-color: #aaf39a;
 	float: left;
 	align-items: center;
@@ -1208,5 +1208,6 @@ div.growlUI {
 }
 
 .divNomListProd{
-	padding: 5px;
+	padding: 2px;
+	cursor: pointer;
 }
